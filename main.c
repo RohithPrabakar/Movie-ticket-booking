@@ -491,7 +491,7 @@ void seat()
        ticket1.m_id=rand();
        printf("your booking id is: %d",ticket1.m_id);
        strcpy(ticket1.m_time,ctime(&t));
-       printticket();//defined in sai.c                                                    //booking id
+       printticket();                                                //booking id
           thank_u();
 
      }

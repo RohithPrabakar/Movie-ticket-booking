@@ -1,30 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
-#include <time.h>
-#include<string.h>
+#include <conio.h>                  //Sudharsan: void mv_select(), void view_all_transcation(), void insert_movie()
+#include <time.h>                   //Rohith: void seat(), void cancel(), void printtickect()
+#include <string.h>                 //pravek: login_admin()/login_guest()
+                                    //priyavarman: welcome(),thank_u()
+                                    //javin:change_price,sturcture,menu_ad(),menu_
 
 //Define
 #define ENTER 13
 #define TAB 9
 #define BKSP 8
 #define SPACE 32
-struct ticket
+
+//Structures
+struct ticket                    //This structure contains the ticket details and will be written to a file transactions.bin
 {
     char m_name[100];
     int m_id;
     int m_noofseats;
     char m_time[50];
     int m_seats[100];
-} ticket1,ticket2;
-struct movie
-{
-    int number;
-    char moviename[100];
-    int price;
-}m1,m2;
+} ticket1,ticket2;              //ticket1 is for receiving info from user and to store it in bin file and ticket 2 is to read from the bin file
 
-//function declaration
+struct movie                  //This structure contains the movie details .For the use of admin
+{
+    char moviename[100];
+}m1,m2;                     //m1 is for writing and m2 for reading into the file
+
+//function prototype
 void welcome();
 void login_admin();
 void login_guest();
@@ -35,11 +38,13 @@ void mv_select();
 int change_price(int price);
 void insert_movie();
 void view_all_transection();
+void seat();
+void printticket();
 
 
 //Global Variable
 time_t t;
-int price=150;
+int price=150;          //this is the predefined price and can be changed by the function change_price
 
 
 
@@ -326,7 +331,7 @@ void menu_guest()
         menu_guest();
     }
 }
-FILE *fptr2;
+FILE *fptr2;                                                       //this declares the file handling variable fptr2
 
 void mv_select()
 {
@@ -337,12 +342,13 @@ void mv_select()
     printf("\t\t        Movie Ticket Booking\n");
     printf("=====================================================================\n\n");
     printf("\t\t\t *Movie Selection\n");
-    fptr2=fopen("movielist.bin","r");
+    fptr2=fopen("movielist.bin","r");//this opens the file movielist.bin and links it to file handling variable fptr2
     int i=1;
-    while(!feof(fptr2))
+    while(fread(&m2,sizeof(struct movie),1,fptr2)==1)              //this line reads the contents of bin file movielist.bin and stores it in m2
+                                                                   //the loop will be run as long the file is not over (same as !feof())
     {
-        fread(&m2,sizeof(struct movie),1,fptr2);
-        printf("\t\t Press <%d> %s\n",i,m2.moviename);
+
+        printf("\t\t Press <%d> %s\n",i,m2.moviename);              //this prints the movies in movielist.bin
         i++;
     }
     fclose(fptr2);
@@ -363,32 +369,13 @@ void mv_select()
         scanf("%d",&ticket1.m_noofseats);
         seat();
     }
-    if (choice==100)
+    if (choice==100){
+        system("clear");
         welcome();
+    }
 
 
 
-
-/*    scanf("%d",&choice);
-    if(choice==1)
-       {
-           strcpy(ticket1.m_name,"Master");
-           printf("enter mumber of tickets");
-           scanf("%d",&ticket1.m_noofseats);
-           seat();
-        }
-    else if(choice==2)
-        {
-            strcpy(ticket1.m_name,"Soorarai pottru");
-            printf("enter mumber of tickets");
-            scanf("%d",&ticket1.m_noofseats);
-            seat();
-        }
-    else if(choice==100)
-        welcome();
-
-}
-*/
 }
 int change_price(int price)
 {
@@ -398,17 +385,17 @@ int change_price(int price)
     scanf("%d",&price);
     return price;
 }
-FILE *fptr;
+FILE *fptr;            //declaration for file handling variable fptr
 void insert_movie()
 {
     system("cls");
     printf("enter movie name:\n");
     scanf("%s",m1.moviename);
-    fptr=fopen("movielist.bin","ab");
-    fwrite(&m1,sizeof(struct movie),1,fptr);
+    fptr=fopen("movielist.bin","ab"); //links fptr to movielist.bin in append mode
+    fwrite(&m1,sizeof(struct movie),1,fptr);//writes the contents of object m1 of structure movie to movielist.bin through fptr
     printf("movie added successfully");
     system("pause");
-    fclose(fptr);
+    fclose(fptr);         //unlinks fptr
     menu_ad();
 }
 
@@ -423,10 +410,71 @@ void purchase()
 void cancel()
 {
     system("cls");
-    printf("this is to cancel ticket");
-}
+    fptr=fopen("transactions.bin","r");                        //links fptr to transactions.bin
+    fptr2=fopen("temp.bin","w");                               //links fptr2 to temp.bin
+    int canid;
+    printf("enter booking id which you wish to cancel\n");
+    scanf("%d",&canid);
+    while(fread(&ticket2,sizeof(struct ticket),1,fptr)==1)      //reads transactions.bin till the end
+    {
+       // printf("3");
+       if(canid==ticket2.m_id)                                    //if a match is found it prints the match and asks for confirmation
+        {
+         //   printf("4");
 
-void printticket()
+            printf("Booking ID:%d\n",ticket2.m_id);
+            printf("Movie Name:%s\n",ticket2.m_name);
+            printf("no of seats:%d\n",ticket2.m_noofseats);
+            for(int i=0;i<ticket2.m_noofseats;i++)
+            printf("seat no :%d\n",ticket2.m_seats[i]);
+            printf("time of booking:%s\n",ticket2.m_time);
+        }
+     }
+
+     //printf("5");
+     fclose(fptr);                                             //unlinks fptr
+     fptr=fopen("transactions.bin","r");                       //links fptr to transactions.bin
+                                                               //the closing and opening is done to reset curson location and to read again from first(can also use seekg)
+     //printf("6");
+     printf("Are you sure you want to cancel?(y/n)\n");
+     char c;
+     c=getch();
+     if(c=='y')
+     {
+       //  printf("7");
+         while(fread(&ticket2,sizeof(struct ticket),1,fptr)!=NULL)//reads till the last
+         {
+         //    printf("8");
+             if(canid==ticket2.m_id)                              //if a match is found skips the next line and goes to nect iteration
+                continue;
+             fwrite(&ticket2,sizeof(struct ticket),1,fptr2);      //if its not a match,writes the contents to temp.bin
+         }                                                        //this allows the program to remove the ticket
+     }
+    else if(c=='n')
+
+     {
+         printf("operation cancelled\n");
+         system("pause");
+         menu_guest();
+     }
+    // printf("10");                                               //rename() can be used at this point but for some reason it didnt work
+    fclose(fptr);
+    fclose(fptr2);
+    fptr=fopen("transactions.bin","w");                            //the next few lines are to copy the contents from temp.bin to transactions.bin
+    fptr2=fopen("temp.bin","r");                                   //this had to be done because rename() didnt work
+    while(fread(&ticket2,sizeof(struct ticket),1,fptr2)==1)
+    {
+        fwrite(&ticket2,sizeof(struct ticket),1,fptr);
+    }
+    fclose(fptr);
+    fclose(fptr2);
+
+    printf("ticket cancelled");
+    system("pause");
+     }
+
+
+void printticket()                                                   //This function just stores the ticket contents in transactions.bin as soon as its been called
 {
 fptr=fopen("transactions.bin","ab");
 fwrite(&ticket1,sizeof(struct ticket),1,fptr);
@@ -436,18 +484,18 @@ fclose(fptr);
 }
 
 
-void view_all_transactions()
+void view_all_transactions()                                             //TO reads all the contents from transactions.bin file and to display it with proper names
 {
-   fptr=fopen("transactions.bin","r");
+   fptr=fopen("transactions.bin","r");                                   //links fptr to transactions.bin
    system("cls");
    time(&t);
    printf("=====================================================================\n");
    printf("\t\t        Movie Ticket Booking\n");
    printf("=====================================================================\n\n");
-   while(!feof(fptr))
+   while(fread(&ticket2,sizeof(struct ticket),1,fptr)==1)               //reads from transactions.bin until the file ends and stores the values in tickte2
    {
-       fread(&ticket2,sizeof(struct ticket),1,fptr);
-       printf("Booking ID:%d\n",ticket2.m_id);
+
+       printf("Booking ID:%d\n",ticket2.m_id);                          //the next few statements are just to print ticket2
        printf("Movie Name:%s\n",ticket2.m_name);
        printf("no of seats:%d\n",ticket2.m_noofseats);
        for(int i=0;i<ticket2.m_noofseats;i++)
@@ -455,7 +503,7 @@ void view_all_transactions()
        printf("time of booking:%s\n",ticket2.m_time);
    }
    printf("\t\t\t  *all transactions\n");
-   fclose(fptr);
+   fclose(fptr);                                                          //unlinks fptr
 
 }
 void seat()
@@ -467,12 +515,21 @@ void seat()
    printf("=====================================================================\n");
    printf("\t\t        Movie Ticket Booking\n");
    printf("=====================================================================\n\n");
-   printf("\t\t\t  *select seat\n");
+   printf("\t\t\t  *Select seat (Max 10)*\n");
+   int seats=1;
+   for(i=0;i<10;i++){
+    for(int j=0;j<10;j++){
+        printf("%d\t",seats);
+        seats++;
+    }
+    printf("\n\n");
+   }
+
    for(i=0;i<ticket1.m_noofseats;i++){
+       printf("Enter the seat number:");
       scanf("%d",&pos[i]);
    }
    for(i=0;i<ticket1.m_noofseats;i++){
-      printf("%d",pos[i]);
       ticket1.m_seats[i]=pos[i];
    }
    {
@@ -487,11 +544,12 @@ void seat()
    if(choice==1)
    {
 
+       srand(time(NULL));
        printf("your ticket has been successfully booked");
        ticket1.m_id=rand();
        printf("your booking id is: %d",ticket1.m_id);
        strcpy(ticket1.m_time,ctime(&t));
-       printticket();//defined in sai.c                                                    //booking id
+       printticket();                                                //booking id
           thank_u();
 
      }

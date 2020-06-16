@@ -417,34 +417,34 @@ void cancel()
     scanf("%d",&canid);
     while(fread(&ticket2,sizeof(struct ticket),1,fptr)==1)      //reads transactions.bin till the end
     {
-       // printf("3");
+
        if(canid==ticket2.m_id)                                    //if a match is found it prints the match and asks for confirmation
         {
-         //   printf("4");
+
 
             printf("Booking ID:%d\n",ticket2.m_id);
             printf("Movie Name:%s\n",ticket2.m_name);
-            printf("no of seats:%d\n",ticket2.m_noofseats);
+            printf("No of seats:%d\n",ticket2.m_noofseats);
             for(int i=0;i<ticket2.m_noofseats;i++)
-            printf("seat no :%d\n",ticket2.m_seats[i]);
+                printf("seat no :%d\n",ticket2.m_seats[i]);
             printf("time of booking:%s\n",ticket2.m_time);
         }
      }
 
-     //printf("5");
+
      fclose(fptr);                                             //unlinks fptr
      fptr=fopen("transactions.bin","r");                       //links fptr to transactions.bin
                                                                //the closing and opening is done to reset curson location and to read again from first(can also use seekg)
-     //printf("6");
+
      printf("Are you sure you want to cancel?(y/n)\n");
      char c;
      c=getch();
      if(c=='y')
      {
-       //  printf("7");
+
          while(fread(&ticket2,sizeof(struct ticket),1,fptr)!=NULL)//reads till the last
          {
-         //    printf("8");
+
              if(canid==ticket2.m_id)                              //if a match is found skips the next line and goes to nect iteration
                 continue;
              fwrite(&ticket2,sizeof(struct ticket),1,fptr2);      //if its not a match,writes the contents to temp.bin
@@ -457,7 +457,7 @@ void cancel()
          system("pause");
          menu_guest();
      }
-    // printf("10");                                               //rename() can be used at this point but for some reason it didnt work
+                                                   //rename() can be used at this point but for some reason it didnt work
     fclose(fptr);
     fclose(fptr2);
     fptr=fopen("transactions.bin","w");                            //the next few lines are to copy the contents from temp.bin to transactions.bin
@@ -476,11 +476,10 @@ void cancel()
 
 void printticket()                                                   //This function just stores the ticket contents in transactions.bin as soon as its been called
 {
-fptr=fopen("transactions.bin","ab");
-fwrite(&ticket1,sizeof(struct ticket),1,fptr);
-printf("transaction successfull");
-system("pause");
-fclose(fptr);
+    fptr=fopen("transactions.bin","ab");
+    fwrite(&ticket1,sizeof(struct ticket),1,fptr);
+    system("pause");
+    fclose(fptr);
 }
 
 
@@ -545,12 +544,19 @@ void seat()
    {
 
        srand(time(NULL));
-       printf("your ticket has been successfully booked");
+       printf("your ticket has been successfully booked\n");
        ticket1.m_id=rand();
-       printf("your booking id is: %d",ticket1.m_id);
        strcpy(ticket1.m_time,ctime(&t));
+       printf("\n\n");
+       printf("\t-----------------Movie Ticket Booking----------------\n");
+       printf("=====================================================================\n\n");
+       printf("Booking ID:%d\n",ticket1.m_id);
+       printf("Movie Name:%s\n",ticket1.m_name);
+       printf("No of seats:%d\n",ticket1.m_noofseats);
+       for(int i=0;i<ticket1.m_noofseats;i++)
+            printf("seat no :%d\n",ticket1.m_seats[i]);
+        printf("time of booking:%s\n",ticket1.m_time);
        printticket();                                                //booking id
-          thank_u();
 
      }
    else if (choice==2)

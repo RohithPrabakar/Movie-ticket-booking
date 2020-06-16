@@ -365,7 +365,7 @@ void mv_select()
            fread(&m2,sizeof(struct movie),1,fptr2);
         }
         strcpy(ticket1.m_name,m2.moviename);
-        printf("enter no of tickets");
+        printf("Enter no of tickets:");
         scanf("%d",&ticket1.m_noofseats);
         seat();
     }
@@ -516,13 +516,24 @@ void seat()
    printf("=====================================================================\n\n");
    printf("\t\t\t  *Select seat (Max 10)*\n");
    int seats=1;
-   for(i=0;i<10;i++){
-    for(int j=0;j<10;j++){
-        printf("%d\t",seats);
-        seats++;
+    for(int area=0;area<10;area++){
+        for(int left=0;left<2;left++){
+            printf("%d\t",seats);
+            seats++;
+        }
+        printf("\t\t");
+        for(int center=0;center<6;center++){
+            printf("%d\t",seats);
+            seats++;
+        }
+        printf("\t\t");
+        for(int right=0;right<2;right++){
+            printf("%d\t",seats);
+            seats++;
+        }
+        printf("\n\n");
     }
     printf("\n\n");
-   }
 
    for(i=0;i<ticket1.m_noofseats;i++){
        printf("Enter the seat number:");
@@ -544,7 +555,7 @@ void seat()
    {
 
        srand(time(NULL));
-       printf("your ticket has been successfully booked\n");
+       printf("*YOUR TICKET HAS BEEN SUCCESSFULLY BOOKED*\n");
        ticket1.m_id=rand();
        strcpy(ticket1.m_time,ctime(&t));
        printf("\n\n");
